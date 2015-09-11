@@ -1,7 +1,14 @@
+# coding: utf-8
+
+from __future__ import print_function
+from __future__ import division
+
 import sys
 import random
 from collections import Counter
 import matplotlib.pyplot as plt
+
+import weather2014
 
 def rain(p):
     '''「真の」降水確率pを引数として与える。
@@ -67,7 +74,7 @@ if __name__ == '__main__':
         a.add(0.4, rain(0.4))
     a.dump_as_csv()
     print(a.get_r2())
-    #a.plot()
+    a.plot()
 
     print('Case 2: 真の降水確率はμ=30%, σ=20%のガウシアン、'
           '予想降水確率はμ=真の降水確率, σ=15%のガウシアン')
@@ -77,30 +84,16 @@ if __name__ == '__main__':
         a.add(p, rain(random.gauss(p, 0.15)))
     a.dump_as_csv()
     print(a.get_r2())
-    #a.plot()
+    a.plot()
 
-    print('Case 3: 東京の2015年8月の天気予報(2日前発表)と、実際の天気')
+    print('Case 3: 東京の2014年の天気予報(2日前発表)と、実際の天気')
     # データは下記を使用。
     # http://homepage3.nifty.com/i_sawaki/WeatherForecast/
     # http://www.data.jma.go.jp/obd/stats/etrn/index.php
-    # 降水確率の定義上、1 mmを越える降雨を雨とした。
+    # 降水確率の定義上、1 mm以上の降雨を雨とした。
     a = Evaluator()
-    pred = [(ord(c) - ord('0')) / 10 for c in
-            '2532213433324523725442443556854']
-    rain = [c == '1' for c in
-            '0010001000001001101110001101111']
-    for p,r in zip(pred, rain):
-        a.add(p, r)
-    a.dump_as_csv()
-    print(a.get_r2())
-    a.plot()
-    print('Case 3-2: さらに、7月のデータも付け加えた')
-    pred = [(ord(c) - ord('0')) / 10 for c in
-            '8577654363212239953432432125333']
-    rain = [c == '1' for c in
-            '1011011110000001111001100001100']
-    for p,r in zip(pred, rain):
-        a.add(p, r)
+    for r,p in weather2014.data:
+        a.add(p / 100, r>=1.0)
     a.dump_as_csv()
     print(a.get_r2())
     a.plot()
